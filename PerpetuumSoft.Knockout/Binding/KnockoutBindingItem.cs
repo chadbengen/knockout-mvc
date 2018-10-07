@@ -14,7 +14,6 @@ namespace PerpetuumSoft.Knockout
             return true;
         }
     }
-
     public class KnockoutBindingItem<TModel, TResult> : KnockoutBindingItem
     {
         public Expression<Func<TModel, TResult>> Expression { get; set; }
@@ -24,7 +23,18 @@ namespace PerpetuumSoft.Knockout
             string value = KnockoutExpressionConverter.Convert(Expression, data);
             if (string.IsNullOrWhiteSpace(value))
                 value = "$data";
-            return string.Format("{0} : {1}", Name, value);
+            return $"{Name}: {value}";
+        }
+    }
+    public class KnockoutBindingStringValueItem : KnockoutBindingItem
+    {
+        public string Value { get; set; }
+
+        public override string GetKnockoutExpression(KnockoutExpressionData data)
+        {
+            if (string.IsNullOrWhiteSpace(Value))
+                Value = "$data";
+            return $"{Name}: '{Value}'";
         }
     }
 }

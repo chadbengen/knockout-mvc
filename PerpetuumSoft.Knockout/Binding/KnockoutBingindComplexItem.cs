@@ -22,11 +22,11 @@ namespace PerpetuumSoft.Knockout
             var builder = new StringBuilder();
 
             builder.Append(Name);
-            builder.Append(" : {");
+            builder.Append(": {");
             for (int i = 0; i < subItems.Count; i++)
             {
                 if (i != 0)
-                    builder.Append(",");
+                    builder.Append(", ");
                 builder.Append(subItems[i].GetKnockoutExpression(data));
             }
             builder.Append('}');

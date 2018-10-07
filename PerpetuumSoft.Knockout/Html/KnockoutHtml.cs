@@ -10,7 +10,7 @@ namespace PerpetuumSoft.Knockout
 {
     public class KnockoutHtml<TModel> : KnockoutSubContext<TModel>
     {
-        private readonly ViewContext viewContext;
+        protected readonly ViewContext viewContext;
 
         public KnockoutHtml(ViewContext viewContext, KnockoutContext<TModel> context, string[] instancesNames = null, Dictionary<string, string> aliases = null)
             : base(context, instancesNames, aliases)
@@ -18,7 +18,7 @@ namespace PerpetuumSoft.Knockout
             this.viewContext = viewContext;
         }
 
-        private KnockoutTagBuilder<TModel> Input(Expression<Func<TModel, object>> text, string type, object htmlAttributes = null)
+        protected KnockoutTagBuilder<TModel> Input(Expression<Func<TModel, object>> text, string type, object htmlAttributes = null)
         {
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "input", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);

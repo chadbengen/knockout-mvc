@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Web.Mvc;
-using System.Web;
 using System.Linq.Expressions;
-using Newtonsoft.Json;
+using System.Text;
+using System.Web;
+using System.Web.Mvc;
 
 namespace PerpetuumSoft.Knockout
 {
@@ -44,8 +44,12 @@ namespace PerpetuumSoft.Knockout
         private string GetInitializeData(TModel model, bool needBinding, string wrapperId, bool applyOnDocumentReady)
         {
             if (isInitialized)
+            {
                 return "";
+            }
+
             isInitialized = true;
+
             KnockoutUtilities.ConvertData(model);
             this.model = model;
 
@@ -71,6 +75,7 @@ namespace PerpetuumSoft.Knockout
             }
             sb.Append(KnockoutJsModelBuilder.AddComputedToModel(model, ViewModelName));
             if (needBinding)
+            {
                 if (!string.IsNullOrEmpty(wrapperId))
                 {
                     sb.AppendLine(string.Format("ko.applyBindings({0}, document.getElementById('{1}'))", ViewModelName, wrapperId));
@@ -79,6 +84,8 @@ namespace PerpetuumSoft.Knockout
                 {
                     sb.AppendLine(string.Format("ko.applyBindings({0});", ViewModelName));
                 }
+            }
+
             if (applyOnDocumentReady)
             {
                 sb.Append("});");
@@ -91,6 +98,31 @@ namespace PerpetuumSoft.Knockout
         {
             return new HtmlString(GetInitializeData(model, false, string.Empty, false));
         }
+
+        /// <summary>
+        /// Adds a script tag containing applying the Ko viewmodel bindings
+        /// </summary>
+        /// <param name="viewModel">The full construction path for the viewmodel such as 'new myProject.viewModels.indexViewModel()'</param>
+        /// <param name="wrapperId"></param>
+        /// <returns></returns>
+        public HtmlString Apply(string viewModel, string wrapperId = "")
+        {
+            isInitialized = true;
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine(@"<script type=""text/javascript""> ");
+            sb.AppendLine("$(function() {");
+            sb.AppendLine(!string.IsNullOrEmpty(wrapperId)
+                ? $"ko.applyBindings({viewModel}, document.getElementById('{wrapperId}'))"
+                : $"ko.applyBindings({viewModel});");
+            sb.AppendLine("});");
+            sb.AppendLine(@"</script>");
+
+            var result = new HtmlString(sb.ToString());
+            return result;
+        }
+
 
         public HtmlString Apply(TModel model, string wrapperId = "", bool applyOnDocumentReady = false)
         {
@@ -131,7 +163,9 @@ namespace PerpetuumSoft.Knockout
 
             string mappingData = KnockoutJsModelBuilder.CreateMappingData<TModel>();
             if (mappingData == "{}")
+            {
                 sb.AppendLine(string.Format("var {0} = ko.mapping.fromJS(data); ", ViewModelName));
+            }
             else
             {
                 sb.AppendLine(string.Format("var {0}MappingData = {1};", ViewModelName, mappingData));
@@ -209,7 +243,10 @@ namespace PerpetuumSoft.Knockout
             var builder = new StringBuilder();
             int count = ActiveSubcontextCount;
             for (int i = 0; i < count; i++)
+            {
                 builder.Append("$parentContext.");
+            }
+
             return builder.ToString();
         }
 

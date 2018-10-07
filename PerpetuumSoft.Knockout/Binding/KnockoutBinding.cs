@@ -202,7 +202,7 @@ namespace PerpetuumSoft.Knockout
             }
         }
 
-        private KnockoutBingindComplexItem ComplexItem(string name)
+        public KnockoutBingindComplexItem ComplexItem(string name)
         {
             if (!complexItems.ContainsKey(name))
             {
@@ -232,7 +232,7 @@ namespace PerpetuumSoft.Knockout
                 if (first)
                     first = false;
                 else
-                    builder.Append(',');
+                    builder.Append(", ");
                 builder.Append(item.GetKnockoutExpression(CreateData()));
             }
             return builder.ToString();
