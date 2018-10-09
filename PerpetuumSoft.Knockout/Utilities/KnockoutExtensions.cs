@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace PerpetuumSoft.Knockout
@@ -15,6 +16,17 @@ namespace PerpetuumSoft.Knockout
             var context = helper.CreateKnockoutContext();
             context.ViewModelName = viewModelName;
             return context;
+        }
+        public static string ExpressionToCamelCase(this string str)
+        {
+            if (!string.IsNullOrEmpty(str) && str.Length > 1)
+            {
+                var values = str.Split('.')
+                    .Select(v => char.ToLowerInvariant(v[0]) + v.Substring(1));
+
+                str = string.Join(".", values);
+            }
+            return str;
         }
     }
 

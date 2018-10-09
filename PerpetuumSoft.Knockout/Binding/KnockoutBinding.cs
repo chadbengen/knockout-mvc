@@ -233,7 +233,7 @@ namespace PerpetuumSoft.Knockout
                     first = false;
                 else
                     builder.Append(", ");
-                builder.Append(item.GetKnockoutExpression(CreateData()));
+                builder.Append(item.GetKnockoutExpression(CreateData(), Context.CamelCase));
             }
             return builder.ToString();
         }

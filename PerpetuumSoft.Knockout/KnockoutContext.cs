@@ -18,8 +18,9 @@ namespace PerpetuumSoft.Knockout
     {
         public string ViewModelName = "viewModel";
 
-        private TModel model;
+        public bool CamelCase = false;
 
+        private TModel model;
 
         public TModel Model
         {
@@ -40,6 +41,11 @@ namespace PerpetuumSoft.Knockout
         private readonly ViewContext viewContext;
 
         private bool isInitialized;
+
+        public void UseCamelCase()
+        {
+            this.CamelCase = true;
+        }
 
         private string GetInitializeData(TModel model, bool needBinding, string wrapperId, bool applyOnDocumentReady)
         {
@@ -200,7 +206,8 @@ namespace PerpetuumSoft.Knockout
         public KnockoutForeachContext<TItem> Foreach<TItem>(Expression<Func<TModel, IList<TItem>>> binding)
         {
             var expression = KnockoutExpressionConverter.Convert(binding, CreateData());
-            var regionContext = new KnockoutForeachContext<TItem>(viewContext, expression);
+            expression = CamelCase ? expression.ExpressionToCamelCase() : expression;
+            var regionContext = new KnockoutForeachContext<TItem>(viewContext, expression, CamelCase);
             regionContext.WriteStart(viewContext.Writer);
             regionContext.ContextStack = ContextStack;
             ContextStack.Add(regionContext);
@@ -210,7 +217,8 @@ namespace PerpetuumSoft.Knockout
         public KnockoutWithContext<TItem> With<TItem>(Expression<Func<TModel, TItem>> binding)
         {
             var expression = KnockoutExpressionConverter.Convert(binding, CreateData());
-            var regionContext = new KnockoutWithContext<TItem>(viewContext, expression);
+            expression = CamelCase ? expression.ExpressionToCamelCase() : expression;
+            var regionContext = new KnockoutWithContext<TItem>(viewContext, expression, CamelCase);
             regionContext.WriteStart(viewContext.Writer);
             regionContext.ContextStack = ContextStack;
             ContextStack.Add(regionContext);
@@ -219,7 +227,9 @@ namespace PerpetuumSoft.Knockout
 
         public KnockoutIfContext<TModel> If(Expression<Func<TModel, bool>> binding)
         {
-            var regionContext = new KnockoutIfContext<TModel>(viewContext, KnockoutExpressionConverter.Convert(binding));
+            var expression = KnockoutExpressionConverter.Convert(binding);
+            expression = CamelCase ? expression.ExpressionToCamelCase() : expression;
+            var regionContext = new KnockoutIfContext<TModel>(viewContext, expression, CamelCase);
             regionContext.InStack = false;
             regionContext.WriteStart(viewContext.Writer);
             return regionContext;

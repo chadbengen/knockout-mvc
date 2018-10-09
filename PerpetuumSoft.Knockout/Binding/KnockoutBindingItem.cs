@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace PerpetuumSoft.Knockout
@@ -7,7 +8,7 @@ namespace PerpetuumSoft.Knockout
     {
         public string Name { get; set; }
 
-        public abstract string GetKnockoutExpression(KnockoutExpressionData data);
+        public abstract string GetKnockoutExpression(KnockoutExpressionData data, bool cc);
 
         public virtual bool IsValid()
         {
@@ -18,11 +19,19 @@ namespace PerpetuumSoft.Knockout
     {
         public Expression<Func<TModel, TResult>> Expression { get; set; }
 
-        public override string GetKnockoutExpression(KnockoutExpressionData data)
+        public override string GetKnockoutExpression(KnockoutExpressionData data, bool cc)
         {
             string value = KnockoutExpressionConverter.Convert(Expression, data);
+
             if (string.IsNullOrWhiteSpace(value))
+            {
                 value = "$data";
+            }
+            if (cc)
+            {
+                value = value.ExpressionToCamelCase();
+            }
+
             return $"{Name}: {value}";
         }
     }
@@ -30,10 +39,13 @@ namespace PerpetuumSoft.Knockout
     {
         public string Value { get; set; }
 
-        public override string GetKnockoutExpression(KnockoutExpressionData data)
+        public override string GetKnockoutExpression(KnockoutExpressionData data, bool cc)
         {
             if (string.IsNullOrWhiteSpace(Value))
+            {
                 Value = "$data";
+            }
+
             return $"{Name}: '{Value}'";
         }
     }
