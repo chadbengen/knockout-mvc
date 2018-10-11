@@ -102,6 +102,7 @@
     <Compile Include="Html\KnockoutFormContext.cs" />
     <Compile Include="SubContexts\KnockoutSubContext.cs" />
     <Compile Include="Html\KnockoutTagBuilder.cs" />
+    <Compile Include="Utilities\Attributes.cs" />
     <Compile Include="Utilities\KnockoutController.cs" />
     <Compile Include="Utilities\KnockoutExpressionConverter.cs" />
     <Compile Include="KnockoutContext.cs" />

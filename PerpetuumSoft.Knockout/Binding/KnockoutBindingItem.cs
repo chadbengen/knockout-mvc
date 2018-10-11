@@ -8,7 +8,7 @@ namespace PerpetuumSoft.Knockout
     {
         public string Name { get; set; }
 
-        public abstract string GetKnockoutExpression(KnockoutExpressionData data, bool cc);
+        public abstract string GetKnockoutExpression(KnockoutExpressionData data);
 
         public virtual bool IsValid()
         {
@@ -19,17 +19,13 @@ namespace PerpetuumSoft.Knockout
     {
         public Expression<Func<TModel, TResult>> Expression { get; set; }
 
-        public override string GetKnockoutExpression(KnockoutExpressionData data, bool cc)
+        public override string GetKnockoutExpression(KnockoutExpressionData data)
         {
             string value = KnockoutExpressionConverter.Convert(Expression, data);
 
             if (string.IsNullOrWhiteSpace(value))
             {
                 value = "$data";
-            }
-            if (cc)
-            {
-                value = value.ExpressionToCamelCase();
             }
 
             return $"{Name}: {value}";
@@ -39,7 +35,7 @@ namespace PerpetuumSoft.Knockout
     {
         public string Value { get; set; }
 
-        public override string GetKnockoutExpression(KnockoutExpressionData data, bool cc)
+        public override string GetKnockoutExpression(KnockoutExpressionData data)
         {
             if (string.IsNullOrWhiteSpace(Value))
             {

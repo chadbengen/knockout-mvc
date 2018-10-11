@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using PerpetuumSoft.Knockout.Utilities;
 
 namespace PerpetuumSoft.Knockout
 {
@@ -130,12 +132,13 @@ namespace PerpetuumSoft.Knockout
 
         protected virtual string VisitMemberAccess(MemberExpression m)
         {
-            return VisitMemberAccess(m.Expression, m.Member.Name);
+            return VisitMemberAccess(m.Expression, m.Member);
         }
 
         //TODO: rewrite
-        private string VisitMemberAccess(Expression obj, string member)
+        private string VisitMemberAccess(Expression obj, MemberInfo memberInfo )
         {
+            var member = memberInfo.Name;
             if (typeof(IKnockoutContext).IsAssignableFrom(obj.Type))
             {
                 var lambda = Expression.Lambda<Func<IKnockoutContext>>(obj);
@@ -144,6 +147,15 @@ namespace PerpetuumSoft.Knockout
                     return context.GetInstanceName();
             }
             var own = Visit(obj);
+            //var memberIsCamelCase = memberInfo.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any();
+            //var ownerIsCamelCase = obj.Type.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any();
+            //var memberIsReadOnly = memberInfo.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any();
+            //var ownerIsReadOnly = obj.Type.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any();
+            var isCamelCase = memberInfo.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any()
+                              || obj.Type.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any();
+            var isReadOnly = memberInfo.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any()
+                              || obj.Type.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any();
+
             if (data.Aliases.ContainsKey(own))
                 own = data.Aliases[own];
             if (lambdaFrom.Contains(own))
@@ -151,8 +163,8 @@ namespace PerpetuumSoft.Knockout
             if ((member == "Length" || member == "Count") && !data.InstanceNames.Contains(own))
                 member = "length";
             string prefix = own == "" ? "" : own + ".";
-            string suffix = member == "length" ? "" : "()";
-            string result = prefix + member + suffix;
+            string suffix = member == "length" ? "" : isReadOnly ? "" : "()";
+            string result = prefix + (isCamelCase ? member.ExpressionToCamelCase2() : member )+ suffix;
             if (data.Aliases.ContainsKey(result))
                 result = data.Aliases[result];
             else if (data.Aliases.ContainsKey(prefix + member))
@@ -258,7 +270,7 @@ namespace PerpetuumSoft.Knockout
                 return obj;
             }
             if (typeof(Expression).IsAssignableFrom(m.Method.ReturnType))
-                return VisitMemberAccess(m.Object, m.Method.Name);
+                return VisitMemberAccess(m.Object, m.Method);
             throw new NotSupportedException();
         }
 

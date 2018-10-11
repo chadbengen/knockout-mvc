@@ -17,7 +17,7 @@ namespace PerpetuumSoft.Knockout
             return subItems.Count > 0;
         }
 
-        public override string GetKnockoutExpression(KnockoutExpressionData data, bool cc)
+        public override string GetKnockoutExpression(KnockoutExpressionData data)
         {
             var builder = new StringBuilder();
 
@@ -27,7 +27,7 @@ namespace PerpetuumSoft.Knockout
             {
                 if (i != 0)
                     builder.Append(", ");
-                builder.Append(subItems[i].GetKnockoutExpression(data, cc));
+                builder.Append(subItems[i].GetKnockoutExpression(data));
             }
             builder.Append('}');
 

@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -17,16 +21,27 @@ namespace PerpetuumSoft.Knockout
             context.ViewModelName = viewModelName;
             return context;
         }
-        public static string ExpressionToCamelCase(this string str)
-        {
-            if (!string.IsNullOrEmpty(str) && str.Length > 1)
-            {
-                var values = str.Split('.')
-                    .Select(v => char.ToLowerInvariant(v[0]) + v.Substring(1));
 
-                str = string.Join(".", values);
+        public static string ExpressionToCamelCase2(this string str)
+        {
+            var sb = new StringBuilder();
+            var matches = Regex.Matches(str, @"[^a-zA-Z\d\s:]");
+            var splitters = matches.Cast<Match>().Select(match => match.Value).Distinct().ToList();
+            foreach (var splitter in splitters)
+            {
+                var results = new List<string>();
+                var values = str.Split(new[] { splitter }, StringSplitOptions.None);
+                foreach (var value in values)
+                {
+                    var result = string.IsNullOrWhiteSpace(value)
+                        ? null
+                        : char.ToLowerInvariant(value[0]) + (value.Length > 1 ? value.Substring(1) : null);
+                    results.Add(result);
+                }
+                str = string.Join(splitter, results);
             }
-            return str;
+
+            return char.ToLowerInvariant(str[0]) + (str.Length > 1 ? str.Substring(1) : null);
         }
     }
 

@@ -4,10 +4,9 @@ namespace PerpetuumSoft.Knockout
 {
     public class KnockoutIfContext<TModel> : KnockoutCommonRegionContext<TModel>
     {
-        public KnockoutIfContext(ViewContext viewContext, string expression, bool cc)
+        public KnockoutIfContext(ViewContext viewContext, string expression)
             : base(viewContext, expression)
         {
-            CamelCase = cc;
         }
 
         protected override string Keyword

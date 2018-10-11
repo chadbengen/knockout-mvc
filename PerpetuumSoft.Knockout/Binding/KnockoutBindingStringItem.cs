@@ -25,7 +25,7 @@ namespace PerpetuumSoft.Knockout
         public string Value { get; set; }
         public bool NeedQuotes { get; set; }
 
-        public override string GetKnockoutExpression(KnockoutExpressionData data, bool cc)
+        public override string GetKnockoutExpression(KnockoutExpressionData data)
         {
             var builder = new StringBuilder();
 
@@ -33,8 +33,6 @@ namespace PerpetuumSoft.Knockout
             builder.Append(" : ");
             if (NeedQuotes)
                 builder.Append('\'');
-
-            Value = cc ? char.ToLowerInvariant(Value[0]) + Value.Substring(1) : Value;
 
             builder.Append(Value);
             if (NeedQuotes)
