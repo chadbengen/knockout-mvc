@@ -525,5 +525,15 @@ namespace PerpetuumSoft.Knockout.Tests
                 }
             }
         }
+
+        [TestMethod]
+        public void VisitNew1()
+        {
+            var viewContext = new ViewContext { Writer = new StringWriter() };
+            var context = new KnockoutContext<TestAttributesModel2>(viewContext);
+            string apply = context.ApplyViewModel("elementId").ToString();
+            //AssertStringEquivalent("blah", apply);
+
+        }
     }
 }

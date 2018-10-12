@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Web;
@@ -122,6 +123,26 @@ namespace PerpetuumSoft.Knockout
             return result;
         }
 
+        public HtmlString ApplyViewModel(string elementId, params object[] constructorParameters)
+        {
+            isInitialized = true;
+            var sb = new StringBuilder();
+            var parameters = constructorParameters.Any() ? string.Join(", ", constructorParameters) : "";
+            var value = typeof(TModel).FullName;
+
+            value = $"new {value}({parameters})";
+
+            sb.AppendLine(@"<script type=""text/javascript""> ");
+            sb.AppendLine("$(function() {");
+            sb.AppendLine(!string.IsNullOrEmpty(elementId)
+                ? $"ko.applyBindings({value}, document.getElementById('{elementId}'))"
+                : $"ko.applyBindings({value});");
+            sb.AppendLine("});");
+            sb.AppendLine(@"</script>");
+
+            var result = new HtmlString(sb.ToString());
+            return result;
+        }
 
         public HtmlString Apply(TModel model, string wrapperId = "", bool applyOnDocumentReady = false)
         {
