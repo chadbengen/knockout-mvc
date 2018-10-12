@@ -165,6 +165,16 @@ namespace PerpetuumSoft.Knockout
             return this;
         }
 
+        public KnockoutBinding<TModel> Click(Expression<Func<TModel, object>> binding)
+        {
+            items.Add(new KnockoutBindingItem<TModel, object> { Name = "click", Expression = binding });
+            return this;
+        }
+        public KnockoutBinding<TModel> Click(string method)
+        {
+            return Custom("click", method);
+        }
+
         public KnockoutBinding<TModel> Click(string actionName, string controllerName, object routeValues = null)
         {
             return Event("click", actionName, controllerName, routeValues);
@@ -185,6 +195,11 @@ namespace PerpetuumSoft.Knockout
         public KnockoutBinding<TModel> Custom(string name, Expression<Func<TModel, object>> binding)
         {
             Items.Add(new KnockoutBindingItem<TModel, object> { Name = name, Expression = binding });
+            return this;
+        }
+        public KnockoutBinding<TModel> Method(string name, Expression<Func<TModel, Action>> method)
+        {
+            Items.Add(new KnockoutBindingItem<TModel, Action> { Name = name, Expression = method });
             return this;
         }
 

@@ -302,6 +302,32 @@ namespace PerpetuumSoft.Knockout
             }
             return new MvcHtmlString(exec);
         }
+        public MvcHtmlString ServerActionLink(string actionName, string controllerName, object routeValues = null)
+        {
+            var url = Url().Action(actionName, controllerName, routeValues);
+            url = url?.Replace("%28", "(");
+            url = url?.Replace("%29", ")");
+            url = url?.Replace("%24", "$");
+            var exec = url;
+            int startIndex = 0;
+            const string parentPrefix = "$parentContext.";
+            while (exec.Substring(startIndex).Contains("$index()"))
+            {
+                string pattern = "$index()";
+                string nextPattern = parentPrefix + pattern;
+                int index = startIndex + exec.Substring(startIndex).IndexOf(pattern, StringComparison.Ordinal);
+                while (index - parentPrefix.Length >= startIndex &&
+                       exec.Substring(index - parentPrefix.Length, nextPattern.Length) == nextPattern)
+                {
+                    index -= parentPrefix.Length;
+                    pattern = nextPattern;
+                    nextPattern = parentPrefix + pattern;
+                }
+                exec = exec.Substring(0, index) + "'+" + pattern + "+'" + exec.Substring(index + pattern.Length);
+                startIndex = index + pattern.Length;
+            }
+            return new MvcHtmlString(exec);
+        }
 
         protected UrlHelper Url()
         {

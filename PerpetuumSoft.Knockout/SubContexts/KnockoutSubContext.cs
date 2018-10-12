@@ -4,9 +4,9 @@ namespace PerpetuumSoft.Knockout
 {
     public abstract class KnockoutSubContext<TModel>
     {
-        protected KnockoutContext<TModel> Context { get; set; }
-        protected string[] InstanceNames { get; set; }
-        protected Dictionary<string, string> Aliases { get; set; }
+        public KnockoutContext<TModel> Context { get; set; }
+        public string[] InstanceNames { get; set; }
+        public Dictionary<string, string> Aliases { get; set; }
 
         protected KnockoutSubContext(KnockoutContext<TModel> context, string[] instanceNames = null, Dictionary<string, string> aliases = null)
         {

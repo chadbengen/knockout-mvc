@@ -1,10 +1,10 @@
-﻿using System;
+﻿using PerpetuumSoft.Knockout.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using PerpetuumSoft.Knockout.Utilities;
 
 namespace PerpetuumSoft.Knockout
 {
@@ -26,7 +26,10 @@ namespace PerpetuumSoft.Knockout
             data = convertData ?? new KnockoutExpressionData();
             data = data.Clone();
             if (data.InstanceNames == null || data.InstanceNames.Length == 0)
+            {
                 data.InstanceNames = new[] { "" };
+            }
+
             return GetterSetterCorrecting(Visit(expression));
         }
 
@@ -35,14 +38,20 @@ namespace PerpetuumSoft.Knockout
         {
             int cnt = expr.Count(c => char.IsLetterOrDigit(c) || c == '(' || c == ')' || c == '_' || c == '.' || c == '$');
             if (cnt == expr.Length && expr.EndsWith("()") && !data.NeedBracketsForAllMembers)
+            {
                 expr = expr.Substring(0, expr.Length - 2);
+            }
+
             return expr;
         }
 
         protected virtual string Visit(Expression exp)
         {
             if (exp == null)
+            {
                 throw new ArgumentNullException();
+            }
+
             switch (exp.NodeType)
             {
                 case ExpressionType.Negate:
@@ -136,7 +145,7 @@ namespace PerpetuumSoft.Knockout
         }
 
         //TODO: rewrite
-        private string VisitMemberAccess(Expression obj, MemberInfo memberInfo )
+        private string VisitMemberAccess(Expression obj, MemberInfo memberInfo)
         {
             var member = memberInfo.Name;
             if (typeof(IKnockoutContext).IsAssignableFrom(obj.Type))
@@ -144,31 +153,43 @@ namespace PerpetuumSoft.Knockout
                 var lambda = Expression.Lambda<Func<IKnockoutContext>>(obj);
                 var context = lambda.Compile()();
                 if (member == "Model")
+                {
                     return context.GetInstanceName();
+                }
             }
             var own = Visit(obj);
-            //var memberIsCamelCase = memberInfo.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any();
-            //var ownerIsCamelCase = obj.Type.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any();
-            //var memberIsReadOnly = memberInfo.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any();
-            //var ownerIsReadOnly = obj.Type.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any();
             var isCamelCase = memberInfo.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any()
                               || obj.Type.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any();
             var isReadOnly = memberInfo.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any()
                               || obj.Type.GetCustomAttributes(typeof(ReadOnlyAttribute), false).Any();
 
             if (data.Aliases.ContainsKey(own))
+            {
                 own = data.Aliases[own];
+            }
+
             if (lambdaFrom.Contains(own))
+            {
                 own = data.InstanceNames[lambdaFrom.IndexOf(own)];
+            }
+
             if ((member == "Length" || member == "Count") && !data.InstanceNames.Contains(own))
+            {
                 member = "length";
+            }
+
             string prefix = own == "" ? "" : own + ".";
             string suffix = member == "length" ? "" : isReadOnly ? "" : "()";
-            string result = prefix + (isCamelCase ? member.ExpressionToCamelCase2() : member )+ suffix;
+            string result = prefix + (isCamelCase ? member.ExpressionToCamelCase2() : member) + suffix;
             if (data.Aliases.ContainsKey(result))
+            {
                 result = data.Aliases[result];
+            }
             else if (data.Aliases.ContainsKey(prefix + member))
+            {
                 result = data.Aliases[prefix + member];
+            }
+
             return result;
         }
 
@@ -181,7 +202,10 @@ namespace PerpetuumSoft.Knockout
         protected virtual string VisitBinary(BinaryExpression b, string sign)
         {
             if (b.NodeType == ExpressionType.Coalesce)
+            {
                 throw new NotSupportedException();
+            }
+
             string left = Visit(b.Left);
             string right = Visit(b.Right);
             if (b.Type == typeof(int) ||
@@ -216,9 +240,15 @@ namespace PerpetuumSoft.Knockout
         protected virtual string VisitConstant(ConstantExpression c)
         {
             if (c.Value is string && !((string)c.Value).StartsWith("$"))
+            {
                 return "'" + c.Value + "'";
+            }
+
             if (c.Value is bool)
+            {
                 return ((bool)c.Value) ? "true" : "false";
+            }
+
             return c.Value == null ? "null" : c.Value.ToString();
         }
 
@@ -233,14 +263,20 @@ namespace PerpetuumSoft.Knockout
         protected virtual string VisitParameter(ParameterExpression p)
         {
             if (lambdaFrom.Contains(p.Name))
+            {
                 return data.InstanceNames[lambdaFrom.IndexOf(p.Name)];
+            }
+
             return p.Name;
         }
 
         protected virtual string VisitLambda(LambdaExpression lambda)
         {
             foreach (var parameter in lambda.Parameters)
+            {
                 lambdaFrom.Add(parameter.Name);
+            }
+
             return Visit(lambda.Body);
         }
 
@@ -260,7 +296,10 @@ namespace PerpetuumSoft.Knockout
             if (m.Arguments.Count == 0 && m.Method.Name == "ToString")
             {
                 if (m.Object is ParameterExpression && lambdaFrom.Contains((m.Object as ParameterExpression).Name))
+                {
                     return "$data";
+                }
+
                 string obj = Visit(m.Object);
                 return obj;
             }
@@ -270,8 +309,66 @@ namespace PerpetuumSoft.Knockout
                 return obj;
             }
             if (typeof(Expression).IsAssignableFrom(m.Method.ReturnType))
+            {
                 return VisitMemberAccess(m.Object, m.Method);
-            throw new NotSupportedException();
+            }
+
+            var method = (ConstantExpression)m.Object;
+            var methodInfo = (MethodInfo)method?.Value;
+            var isCamelCase = m.Method.GetCustomAttributes(typeof(CamelCaseAttribute), false).Any()
+                              || (methodInfo?.DeclaringType?.GetCustomAttributes(typeof(CamelCaseAttribute), false)
+                                      .Any() ?? false);
+
+            var member = isCamelCase ? methodInfo?.Name.ExpressionToCamelCase2() : methodInfo?.Name;
+            var result = "";
+            if (m.Arguments.Count > 1)
+            {
+                for (int i = 0; i < m.Arguments.Count; i++)
+                {
+                    var mArgument = m.Arguments[i];
+
+                    if (typeof(IKnockoutContext).IsAssignableFrom(m.Type))
+                    {
+                        var lambda = Expression.Lambda<Func<IKnockoutContext>>(m);
+                        var context = lambda.Compile()();
+                        if (member == "Model")
+                        {
+                            return context.GetInstanceName();
+                        }
+                    }
+
+                    var own = Visit(mArgument);
+                    if (data.Aliases.ContainsKey(own))
+                    {
+                        own = data.Aliases[own];
+                    }
+
+                    if (lambdaFrom.Contains(own))
+                    {
+                        own = data.InstanceNames[lambdaFrom.IndexOf(own)];
+                    }
+
+                    //if ((member == "Length" || member == "Count") && !data.InstanceNames.Contains(own))
+                    //{
+                    //    member = "length";
+                    //}
+
+                    //TODO: This is hacky. THere has to be a better way.
+                    string prefix = own == "" || own.StartsWith("System") ? "" : own + ".";
+                    //string suffix =   "";
+                    result = prefix + (isCamelCase ? member.ExpressionToCamelCase2() : member);
+                    //if (data.Aliases.ContainsKey(result))
+                    //{
+                    //    result = data.Aliases[result];
+                    //}
+                    //else if (data.Aliases.ContainsKey(prefix + member))
+                    //{
+                    //    result = data.Aliases[prefix + member];
+                    //}
+                }
+            }
+
+            return result;
         }
 
         protected virtual ReadOnlyCollection<string> VisitExpressionList(ReadOnlyCollection<Expression> original)

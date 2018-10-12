@@ -31,6 +31,7 @@ namespace PerpetuumSoft.Knockout
             return $"{Name}: {value}";
         }
     }
+
     public class KnockoutBindingStringValueItem : KnockoutBindingItem
     {
         public string Value { get; set; }

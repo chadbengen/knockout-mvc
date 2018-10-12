@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
 using System.Linq.Expressions;
+using System.Web.Mvc;
 
 namespace PerpetuumSoft.Knockout.Tests
 {
@@ -29,21 +26,21 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ConstructorCommonTest1()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.A), "this.A()",
+            RunTest((Expression<Func<TestModel, string>>)(model => model.A), "this.A()",
                 KnockoutExpressionData.CreateConstructorData());
         }
 
         [TestMethod]
         public void ConstructorCommonTest2()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.A + model.B), "(this.A() + this.B())",
+            RunTest((Expression<Func<TestModel, string>>)(model => model.A + model.B), "(this.A() + this.B())",
                 KnockoutExpressionData.CreateConstructorData());
         }
 
         [TestMethod]
         public void ConstructorCommonTest3()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.A + model.B + "!"),
+            RunTest((Expression<Func<TestModel, string>>)(model => model.A + model.B + "!"),
                 "((this.A() + this.B()) + '!')", KnockoutExpressionData.CreateConstructorData());
         }
 
@@ -51,70 +48,70 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void CommonTest01()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.A), "A");
+            RunTest((Expression<Func<TestModel, string>>)(model => model.A), "A");
         }
 
         [TestMethod]
         public void CommonTest02()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.A + model.B), "(A() + B())");
+            RunTest((Expression<Func<TestModel, string>>)(model => model.A + model.B), "(A() + B())");
         }
 
         [TestMethod]
         public void CommonTest03()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.Bool ? model.A : "Line"),
+            RunTest((Expression<Func<TestModel, string>>)(model => model.Bool ? model.A : "Line"),
                 "Bool() ? A() : 'Line'");
         }
 
         [TestMethod]
         public void CommonTest04()
         {
-            RunTest((Expression<Func<TestModel, bool>>) (model => true), "true");
+            RunTest((Expression<Func<TestModel, bool>>)(model => true), "true");
         }
 
         [TestMethod]
         public void CommonTest05()
         {
-            RunTest((Expression<Func<TestModel, bool>>) (model => false), "false");
+            RunTest((Expression<Func<TestModel, bool>>)(model => false), "false");
         }
 
         [TestMethod]
         public void CommonTest06()
         {
-            RunTest((Expression<Func<TestModel, bool>>) (model => !model.Bool), "!Bool()");
+            RunTest((Expression<Func<TestModel, bool>>)(model => !model.Bool), "!Bool()");
         }
 
         // Length
         [TestMethod]
         public void LengthTest01()
         {
-            RunTest((Expression<Func<TestModel, int>>) (model => model.A.Length), "A().length");
+            RunTest((Expression<Func<TestModel, int>>)(model => model.A.Length), "A().length");
         }
 
         [TestMethod]
         public void LengthTest02()
         {
-            RunTest((Expression<Func<TestModel, bool>>) (model => model.A.Length > 0), "(A().length > 0)");
+            RunTest((Expression<Func<TestModel, bool>>)(model => model.A.Length > 0), "(A().length > 0)");
         }
 
         [TestMethod]
         public void LengthTest03()
         {
-            RunTest((Expression<Func<TestModel, int>>) (model => model.List.Count), "List().length");
+            RunTest((Expression<Func<TestModel, int>>)(model => model.List.Count), "List().length");
         }
 
         // Nested
         [TestMethod]
         public void NestedTest01()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.SubModel.A), "SubModel().A");
+            RunTest((Expression<Func<TestModel, string>>)(model => model.SubModel.A), "SubModel().A");
         }
 
         [TestMethod]
         public void NestedTest02()
         {
-            RunTest((Expression<Func<TestModel, string>>) (model => model.SubModel.SubModel.SubModel.A),
+            RunTest((Expression<Func<TestModel, string>>)(model => model.SubModel.SubModel.SubModel.A),
                 "SubModel().SubModel().SubModel().A");
         }
 
@@ -122,15 +119,15 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void InstanceNamesTest01()
         {
-            var data = new KnockoutExpressionData {InstanceNames = new[] {"$parent"}};
-            RunTest((Expression<Func<TestModel, string>>) (model => model.A), "$parent.A", data);
+            var data = new KnockoutExpressionData { InstanceNames = new[] { "$parent" } };
+            RunTest((Expression<Func<TestModel, string>>)(model => model.A), "$parent.A", data);
         }
 
         [TestMethod]
         public void InstanceNamesTest02()
         {
-            var data = new KnockoutExpressionData {InstanceNames = new[] {"X", "Y", "Z"}};
-            RunTest((Expression<Func<TestModel, TestModel, TestModel, string>>) ((x, y, z) => x.A + y.B + z.C),
+            var data = new KnockoutExpressionData { InstanceNames = new[] { "X", "Y", "Z" } };
+            RunTest((Expression<Func<TestModel, TestModel, TestModel, string>>)((x, y, z) => x.A + y.B + z.C),
                 "((X.A()+Y.B())+Z.C())", data);
         }
 
@@ -151,7 +148,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ContextTest01()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestModel>(viewContext);
             using (var subContext = context.With(m => m.SubModel))
             {
@@ -170,7 +167,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ContextTest02()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestModel>(viewContext);
             using (var subContext = context.Foreach(m => m.IntList))
             {
@@ -182,7 +179,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ContextTest03()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestModel>(viewContext);
             using (var subContext = context.Foreach(m => m.IntList))
             {
@@ -195,7 +192,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ValueUpdateInput()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestModel>(viewContext);
             var binding = new KnockoutBinding<TestModel>(context);
             string bind = context.Bind.Text(m => m.A).ValueUpdate(KnockoutValueUpdateKind.Input)
@@ -224,21 +221,21 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ConstructorCommonTest1()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.A), "this.a()",
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.A), "this.a()",
                 KnockoutExpressionData.CreateConstructorData());
         }
 
         [TestMethod]
         public void ConstructorCommonTest2()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.A + model.B), "(this.a() + this.B)",
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.A + model.B), "(this.a() + this.B)",
                 KnockoutExpressionData.CreateConstructorData());
         }
 
         [TestMethod]
         public void ConstructorCommonTest3()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.A + model.B + "!"),
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.A + model.B + "!"),
                 "((this.a() + this.B) + '!')", KnockoutExpressionData.CreateConstructorData());
         }
 
@@ -246,70 +243,70 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void CommonTest01()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.A), "a");
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.A), "a");
         }
 
         [TestMethod]
         public void CommonTest02()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.A + model.B), "(a() + B)");
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.A + model.B), "(a() + B)");
         }
 
         [TestMethod]
         public void CommonTest03()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.Bool ? model.A : "Line"),
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.Bool ? model.A : "Line"),
                 "Bool() ? a() : 'Line'");
         }
 
         [TestMethod]
         public void CommonTest04()
         {
-            RunTest((Expression<Func<TestAttributesModel, bool>>) (model => true), "true");
+            RunTest((Expression<Func<TestAttributesModel, bool>>)(model => true), "true");
         }
 
         [TestMethod]
         public void CommonTest05()
         {
-            RunTest((Expression<Func<TestAttributesModel, bool>>) (model => false), "false");
+            RunTest((Expression<Func<TestAttributesModel, bool>>)(model => false), "false");
         }
 
         [TestMethod]
         public void CommonTest06()
         {
-            RunTest((Expression<Func<TestAttributesModel, bool>>) (model => !model.Bool), "!Bool()");
+            RunTest((Expression<Func<TestAttributesModel, bool>>)(model => !model.Bool), "!Bool()");
         }
 
         // Length
         [TestMethod]
         public void LengthTest01()
         {
-            RunTest((Expression<Func<TestAttributesModel, int>>) (model => model.A.Length), "a().length");
+            RunTest((Expression<Func<TestAttributesModel, int>>)(model => model.A.Length), "a().length");
         }
 
         [TestMethod]
         public void LengthTest02()
         {
-            RunTest((Expression<Func<TestAttributesModel, bool>>) (model => model.A.Length > 0), "(a().length > 0)");
+            RunTest((Expression<Func<TestAttributesModel, bool>>)(model => model.A.Length > 0), "(a().length > 0)");
         }
 
         [TestMethod]
         public void LengthTest03()
         {
-            RunTest((Expression<Func<TestAttributesModel, int>>) (model => model.List.Count), "List().length");
+            RunTest((Expression<Func<TestAttributesModel, int>>)(model => model.List.Count), "List().length");
         }
 
         // Nested
         [TestMethod]
         public void NestedTest01()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.SubModel.A), "SubModel().a");
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.SubModel.A), "SubModel().a");
         }
 
         [TestMethod]
         public void NestedTest02()
         {
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.SubModel.SubModel.SubModel.A),
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.SubModel.SubModel.SubModel.A),
                 "SubModel().SubModel().SubModel().a");
         }
 
@@ -317,17 +314,17 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void InstanceNamesTest01()
         {
-            var data = new KnockoutExpressionData {InstanceNames = new[] {"$parent"}};
-            RunTest((Expression<Func<TestAttributesModel, string>>) (model => model.A), "$parent.a", data);
+            var data = new KnockoutExpressionData { InstanceNames = new[] { "$parent" } };
+            RunTest((Expression<Func<TestAttributesModel, string>>)(model => model.A), "$parent.a", data);
         }
 
         [TestMethod]
         public void InstanceNamesTest02()
         {
-            var data = new KnockoutExpressionData {InstanceNames = new[] {"X", "Y", "Z"}};
+            var data = new KnockoutExpressionData { InstanceNames = new[] { "X", "Y", "Z" } };
             RunTest(
-                (Expression<Func<TestAttributesModel, TestAttributesModel, TestAttributesModel, string>>) ((x, y, z) =>
-                    x.A + y.B + z.C), "((X.a()+Y.B)+Z.C())", data);
+                (Expression<Func<TestAttributesModel, TestAttributesModel, TestAttributesModel, string>>)((x, y, z) =>
+                   x.A + y.B + z.C), "((X.a()+Y.B)+Z.C())", data);
         }
 
         // Aliases 
@@ -347,7 +344,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ContextTest01()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestAttributesModel>(viewContext);
             using (var subContext = context.With(m => m.SubModel))
             {
@@ -366,7 +363,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ContextTest02()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestAttributesModel>(viewContext);
             using (var subContext = context.Foreach(m => m.IntList))
             {
@@ -378,7 +375,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ContextTest03()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestAttributesModel>(viewContext);
             using (var subContext = context.Foreach(m => m.IntList))
             {
@@ -391,7 +388,7 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ValueUpdateInput()
         {
-            var viewContext = new ViewContext {Writer = new StringWriter()};
+            var viewContext = new ViewContext { Writer = new StringWriter() };
             var context = new KnockoutContext<TestAttributesModel>(viewContext);
             var binding = new KnockoutBinding<TestAttributesModel>(context);
             string bind = context.Bind.Text(m => m.A).ValueUpdate(KnockoutValueUpdateKind.Input)
@@ -420,21 +417,21 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void ConstructorCommonTest1()
         {
-            RunTest((Expression<Func<TestAttributesModel2, string>>) (model => model.A), "this.a",
+            RunTest((Expression<Func<TestAttributesModel2, string>>)(model => model.A), "this.a",
                 KnockoutExpressionData.CreateConstructorData());
         }
 
         [TestMethod]
         public void ConstructorCommonTest2()
         {
-            RunTest((Expression<Func<TestAttributesModel2, string>>) (model => model.A + model.B), "(this.a + this.b)",
+            RunTest((Expression<Func<TestAttributesModel2, string>>)(model => model.A + model.B), "(this.a + this.b)",
                 KnockoutExpressionData.CreateConstructorData());
         }
 
         [TestMethod]
         public void ConstructorCommonTest3()
         {
-            RunTest((Expression<Func<TestAttributesModel2, string>>) (model => model.A + model.B + "!"),
+            RunTest((Expression<Func<TestAttributesModel2, string>>)(model => model.A + model.B + "!"),
                 "((this.a + this.b) + '!')", KnockoutExpressionData.CreateConstructorData());
         }
 
@@ -442,34 +439,91 @@ namespace PerpetuumSoft.Knockout.Tests
         [TestMethod]
         public void CommonTest01()
         {
-            RunTest((Expression<Func<TestAttributesModel2, string>>) (model => model.A), "a");
+            RunTest((Expression<Func<TestAttributesModel2, string>>)(model => model.A), "a");
         }
 
         [TestMethod]
         public void CommonTest02()
         {
-            RunTest((Expression<Func<TestAttributesModel2, string>>) (model => model.A + model.B), "(a + b)");
+            RunTest((Expression<Func<TestAttributesModel2, string>>)(model => model.A + model.B), "(a + b)");
         }
 
         // Length
         [TestMethod]
         public void LengthTest01()
         {
-            RunTest((Expression<Func<TestAttributesModel2, int>>) (model => model.A.Length), "a.length");
+            RunTest((Expression<Func<TestAttributesModel2, int>>)(model => model.A.Length), "a.length");
         }
 
         [TestMethod]
         public void LengthTest02()
         {
-            RunTest((Expression<Func<TestAttributesModel2, bool>>) (model => model.A.Length > 0), "(a.length > 0)");
+            RunTest((Expression<Func<TestAttributesModel2, bool>>)(model => model.A.Length > 0), "(a.length > 0)");
         }
 
         // InstaceNames
         [TestMethod]
         public void InstanceNamesTest01()
         {
-            var data = new KnockoutExpressionData {InstanceNames = new[] {"$parent"}};
-            RunTest((Expression<Func<TestAttributesModel2, string>>) (model => model.A), "$parent.a", data);
+            var data = new KnockoutExpressionData { InstanceNames = new[] { "$parent" } };
+            RunTest((Expression<Func<TestAttributesModel2, string>>)(model => model.A), "$parent.a", data);
+        }
+    }
+
+    [TestClass]
+    public class KnockoutExpressionActionTest
+    {
+        private void AssertStringEquivalent(string a, string b)
+        {
+            a = a.Replace(" ", "");
+            b = b.Replace(" ", "");
+            Assert.AreEqual(a, b);
+        }
+
+        private void RunTest(Expression expression,
+            string expected,
+            KnockoutExpressionData data = null)
+        {
+            string actual = KnockoutExpressionConverter.Convert(expression, data);
+            AssertStringEquivalent(expected, actual);
+        }
+
+        [TestMethod]
+        public void Method1()
+        {
+            RunTest((Expression<Func<TestAttributesModel2, Action>>)(model => model.Method), "method");
+        }
+
+        [TestMethod]
+        public void ContextMethod1()
+        {
+            var viewContext = new ViewContext { Writer = new StringWriter() };
+            var context = new KnockoutContext<TestAttributesModel2>(viewContext);
+            using (var subContext = context.Foreach(m => m.IntList))
+            {
+                string bind = subContext.Bind.Method("test", m => context.Model.Method).BindingAttributeContent();
+                AssertStringEquivalent("test: $parent.method", bind);
+            }
+        }
+        [TestMethod]
+        public void ContextTest01()
+        {
+            var viewContext = new ViewContext { Writer = new StringWriter() };
+            var context = new KnockoutContext<TestAttributesModel2>(viewContext);
+            using (var subContext = context.With(m => m.SubModel))
+            {
+                string bind = subContext.Bind.Method("test", m => context.Model.Method).BindingAttributeContent();
+                AssertStringEquivalent("test: $parent.method", bind);
+
+                using (var subSubContext = subContext.Foreach(m => m.List))
+                {
+                    string subBind = subSubContext.Bind.Method("subTest", m => context.Model.Method).BindingAttributeContent();
+                    AssertStringEquivalent("subTest:$parents[1].method", subBind);
+
+                    string subBind2 = subSubContext.Bind.Method("subContextTest", m => subContext.Model.Method).BindingAttributeContent();
+                    AssertStringEquivalent("subContextTest:$parent.method", subBind2);
+                }
+            }
         }
     }
 }

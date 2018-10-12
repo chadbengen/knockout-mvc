@@ -10,7 +10,7 @@ namespace PerpetuumSoft.Knockout
 {
     public class KnockoutHtml<TModel> : KnockoutSubContext<TModel>
     {
-        protected readonly ViewContext viewContext;
+        public readonly ViewContext viewContext;
 
         public KnockoutHtml(ViewContext viewContext, KnockoutContext<TModel> context, string[] instancesNames = null, Dictionary<string, string> aliases = null)
             : base(context, instancesNames, aliases)
@@ -23,13 +23,18 @@ namespace PerpetuumSoft.Knockout
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "input", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);
             if (!string.IsNullOrWhiteSpace(type))
+            {
                 tagBuilder.ApplyAttributes(new { type });
+            }
+
             if (text != null)
             {
                 tagBuilder.Value(text);
                 var memberExpression = text.Body as MemberExpression;
                 if (memberExpression != null)
+                {
                     tagBuilder.ApplyAttributes(new { name = memberExpression.Member.Name });
+                }
             }
             tagBuilder.TagRenderMode = TagRenderMode.SelfClosing;
             return tagBuilder;
@@ -45,9 +50,9 @@ namespace PerpetuumSoft.Knockout
             return Input(text, "password", htmlAttributes);
         }
 
-		public KnockoutTagBuilder<TModel> Hidden(Expression<Func<TModel, object>> text = null, object htmlAttributes = null)
+        public KnockoutTagBuilder<TModel> Hidden(Expression<Func<TModel, object>> text = null, object htmlAttributes = null)
         {
-			return Input(text, "hidden", htmlAttributes);
+            return Input(text, "hidden", htmlAttributes);
         }
 
         public KnockoutTagBuilder<TModel> RadioButton(Expression<Func<TModel, object>> @checked, object htmlAttributes = null)
@@ -77,7 +82,10 @@ namespace PerpetuumSoft.Knockout
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "select", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);
             if (options != null)
+            {
                 tagBuilder.Options(Expression.Lambda<Func<TModel, IEnumerable>>(options.Body, options.Parameters));
+            }
+
             if (optionsText != null)
             {
                 var data = new KnockoutExpressionData { InstanceNames = new[] { "item" } };
@@ -90,11 +98,20 @@ namespace PerpetuumSoft.Knockout
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "select", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);
             if (options != null)
+            {
                 tagBuilder.Options(Expression.Lambda<Func<TModel, IEnumerable>>(options.Body, options.Parameters));
+            }
+
             if (!string.IsNullOrEmpty(optionsTextValue))
+            {
                 tagBuilder.OptionsText(optionsTextValue, true);
+            }
+
             if (!string.IsNullOrEmpty(optionsIdValue))
+            {
                 tagBuilder.OptionsValue(optionsIdValue, true);
+            }
+
             return tagBuilder;
         }
 
@@ -110,17 +127,23 @@ namespace PerpetuumSoft.Knockout
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "select", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);
             if (options != null)
+            {
                 tagBuilder.Options(Expression.Lambda<Func<TModel, IEnumerable>>(options.Body, options.Parameters));
+            }
+
             if (optionsText != null)
             {
                 var data = CreateData();
                 var keys = data.Aliases.Keys.ToList();
                 if (!string.IsNullOrEmpty(Context.GetInstanceName()))
+                {
                     foreach (var key in keys)
                     {
                         data.Aliases[Context.GetInstanceName() + "." + key] = data.Aliases[key];
                         data.Aliases.Remove(key);
                     }
+                }
+
                 data.InstanceNames = new[] { Context.GetInstanceName(), "item" };
                 tagBuilder.OptionsText("function(item) { return " + KnockoutExpressionConverter.Convert(optionsText, data) + "; }");
             }
@@ -158,21 +181,43 @@ namespace PerpetuumSoft.Knockout
             return tagBuilder;
         }
 
-        public KnockoutTagBuilder<TModel> Button(string caption, string actionName, string controllerName, object routeValues = null, object htmlAttributes = null)
+        public KnockoutTagBuilder<TModel> Button(string caption, string route, string controllerName, object routeValues = null, object htmlAttributes = null)
         {
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "button", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);
-            tagBuilder.Click(actionName, controllerName, routeValues);
+            tagBuilder.Click(route, controllerName, routeValues);
             tagBuilder.SetInnerHtml(HttpUtility.HtmlEncode(caption));
             return tagBuilder;
         }
 
-        public KnockoutTagBuilder<TModel> HyperlinkButton(string caption, string actionName, string controllerName, object routeValues = null, object htmlAttributes = null)
+        public KnockoutTagBuilder<TModel> ActionLink(string caption, string route, string controllerName, object routeValues = null, object htmlAttributes = null)
+        {
+            throw new NotImplementedException(nameof(ActionLink));
+
+            //var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "a", InstanceNames, Aliases);
+            //tagBuilder.ApplyAttributes(htmlAttributes);
+
+            //string value = KnockoutExpressionConverter.Convert(routeValues);
+            //var url = Context.ServerAction(route, controllerName, value);
+            //tagBuilder.Attr("href", url.ToString());
+
+            //tagBuilder.SetInnerHtml(HttpUtility.HtmlEncode(caption));
+
+
+            //var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "button", InstanceNames, Aliases);
+            //tagBuilder.ApplyAttributes(htmlAttributes);
+            //tagBuilder.Click(route, controllerName, routeValues);
+            //tagBuilder.SetInnerHtml(HttpUtility.HtmlEncode(caption));
+            //return tagBuilder;
+
+        }
+
+        public KnockoutTagBuilder<TModel> HyperlinkButton(string caption, string route, string controllerName, object routeValues = null, object htmlAttributes = null)
         {
             var tagBuilder = new KnockoutTagBuilder<TModel>(Context, "a", InstanceNames, Aliases);
             tagBuilder.ApplyAttributes(htmlAttributes);
             tagBuilder.ApplyAttributes(new { href = "#" });
-            tagBuilder.Click(actionName, controllerName, routeValues);
+            tagBuilder.Click(route, controllerName, routeValues);
             tagBuilder.SetInnerHtml(HttpUtility.HtmlEncode(caption));
             return tagBuilder;
         }

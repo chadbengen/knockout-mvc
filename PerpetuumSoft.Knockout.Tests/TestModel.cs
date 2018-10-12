@@ -59,7 +59,7 @@ namespace PerpetuumSoft.Knockout.Tests
             }
         }
 
-    }
+   }
 
     [CamelCase]
     [ReadOnly]
@@ -70,5 +70,9 @@ namespace PerpetuumSoft.Knockout.Tests
         public string B { get; set; }
 
         public string C { get; set; }
+        public void Method() { }
+        public List<string> List { get; set; }
+        public List<int> IntList { get; set; }
+        public TestAttributesModel2 SubModel { get; set; }
     }
 }
